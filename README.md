@@ -1,2 +1,2 @@
 # LoopMIT
-Backups of working GUI code. Will be updates as I make changes
+Backups of working Loop code. Will be updates as we make changes
