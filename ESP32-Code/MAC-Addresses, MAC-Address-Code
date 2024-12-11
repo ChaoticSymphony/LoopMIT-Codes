@@ -1,0 +1,39 @@
+Parent- 3c:71:bf:85:b7:ec
+A- 88:13:bf:03:67:20
+B- e4:65:b8:79:5a:74
+C- a8:42:e3:bb:b6:3c
+D- cc:db:a7:92:18:48
+
+
+
+#include <WiFi.h>
+#include <esp_wifi.h>
+
+
+void readMacAddress(){
+  uint8_t baseMac[6];
+  esp_err_t ret = esp_wifi_get_mac(WIFI_IF_STA, baseMac);
+  if (ret == ESP_OK) {
+    Serial.printf("%02x:%02x:%02x:%02x:%02x:%02x\n",
+                  baseMac[0], baseMac[1], baseMac[2],
+                  baseMac[3], baseMac[4], baseMac[5]);
+  } else {
+    Serial.println("Failed to read MAC address");
+  }
+}
+
+
+void setup(){
+  Serial.begin(115200);
+
+
+  WiFi.mode(WIFI_STA);
+  WiFi.STA.begin();
+
+
+  Serial.print("[DEFAULT] ESP32 Board MAC Address: ");
+  readMacAddress();
+}
+ 
+void loop(){
+}
