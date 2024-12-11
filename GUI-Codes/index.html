@@ -24,9 +24,10 @@
         </p>
       </div>
       <!-- Relay Control Buttons -->
-      <button class="button2" onclick="toggleRelay('on')">ON</button>
-      <button class="button3" onclick="toggleRelay('off')">OFF</button>
+      <button class="button2" onclick="toggleRelay('on')" id="relayOn">ON</button>
+      <button class="button3" onclick="toggleRelay('off')" id="relayOff">OFF</button>
       <button class="button1">ESTOP</button>
+      <button id="connectParent" style="color: red;">Connect to Parent ESP</button> <!-- Button with initial red color -->
     </div>
     <div class="sec_main" style="display: flex">
       <div class="sec_lim_acc">
@@ -35,12 +36,7 @@
             <p>Acceleration</p>
             <button
               id="acceleration"
-              style="
-                font-size: 30px;
-                border-radius: 10px;
-                height: 100px;
-                margin: 10px;
-              "
+              style="font-size: 30px; border-radius: 10px; height: 100px; margin: 10px;"
             >
               100 ms^-2
             </button>
@@ -49,12 +45,7 @@
             <p>Voltage</p>
             <button
               id="voltage"
-              style="
-                font-size: 30px;
-                border-radius: 10px;
-                height: 100px;
-                margin: 10px;
-              "
+              style="font-size: 30px; border-radius: 10px; height: 100px; margin: 10px;"
             >
               200 V
             </button>
@@ -63,10 +54,7 @@
         <div class="horizontal-section" style="width: 440px; margin: 10px">
           <div class="second_section">
             <p>LIM Temperature</p>
-            <button
-              style="font-size: 30px; border-radius: 10px; height: 100px"
-              id="lim_temp"
-            >
+            <button style="font-size: 30px; border-radius: 10px; height: 100px" id="lim_temp">
               45°C
             </button>
           </div>
@@ -78,23 +66,13 @@
           <div class="high-voltage-buttons">
             <button
               id="high_battery_temp"
-              style="
-                font-size: 30px;
-                border-radius: 10px;
-                height: 100px;
-                margin: 25px;
-              "
+              style="font-size: 30px; border-radius: 10px; height: 100px; margin: 25px;"
             >
               40°C
             </button>
             <button
               id="high_battery_voltage"
-              style="
-                font-size: 30px;
-                border-radius: 10px;
-                height: 100px;
-                margin: 25px;
-              "
+              style="font-size: 30px; border-radius: 10px; height: 100px; margin: 25px;"
             >
               50 V
             </button>
@@ -102,23 +80,13 @@
           <div class="high-voltage-buttons">
             <button
               id="high_battery_power"
-              style="
-                font-size: 30px;
-                border-radius: 10px;
-                height: 100px;
-                margin: 25px;
-              "
+              style="font-size: 30px; border-radius: 10px; height: 100px; margin: 25px;"
             >
               200W
             </button>
             <button
               id="high_battery_current"
-              style="
-                font-size: 30px;
-                border-radius: 10px;
-                height: 100px;
-                margin: 25px;
-              "
+              style="font-size: 30px; border-radius: 10px; height: 100px; margin: 25px;"
             >
               100A
             </button>
@@ -129,23 +97,13 @@
           <div class="low-voltage-buttons">
             <button
               id="low_battery_temp"
-              style="
-                font-size: 30px;
-                border-radius: 10px;
-                height: 100px;
-                margin: 25px;
-              "
+              style="font-size: 30px; border-radius: 10px; height: 100px; margin: 25px;"
             >
               55°C
             </button>
             <button
               id="low_battery_voltage"
-              style="
-                font-size: 30px;
-                border-radius: 10px;
-                height: 100px;
-                margin: 25px;
-              "
+              style="font-size: 30px; border-radius: 10px; height: 100px; margin: 25px;"
             >
               20 V
             </button>
@@ -153,23 +111,13 @@
           <div class="low-voltage-buttons">
             <button
               id="low_battery_power"
-              style="
-                font-size: 30px;
-                border-radius: 10px;
-                height: 100px;
-                margin: 25px;
-              "
+              style="font-size: 30px; border-radius: 10px; height: 100px; margin: 25px;"
             >
               35W
             </button>
             <button
               id="low_battery_current"
-              style="
-                font-size: 30px;
-                border-radius: 10px;
-                height: 100px;
-                margin: 25px;
-              "
+              style="font-size: 30px; border-radius: 10px; height: 100px; margin: 25px;"
             >
               50A
             </button>
@@ -221,11 +169,48 @@
 
   <script src="script.js"></script>
   <script>
-    // Function to toggle the relay
+    let port;
+let writer;
+
+// Connect to the Parent ESP32 via USB
+document.getElementById("connectParent").addEventListener("click", async () => {
+  try {
+    console.log("Requesting port...");
+    port = await navigator.serial.requestPort();
+    console.log("Port selected: ", port);
+
+    console.log("Opening serial connection...");
+    await port.open({ baudRate: 115200 });
+    console.log("Connection opened.");
+
+    const encoder = new TextEncoderStream();
+    encoder.readable.pipeTo(port.writable);
+    writer = encoder.writable.getWriter();
+
+    // Change the button text color to green when connected
+    document.getElementById("connectParent").style.color = "green";
+
+    // Add event listener for port disconnection
+    port.addEventListener("disconnect", () => {
+      // Change button color back to red if port disconnects
+      document.getElementById("connectParent").style.color = "red";
+      writer = null;
+    });
+  } catch (err) {
+    console.error("Error connecting to Parent ESP32:", err);
+    // Change the button text color to red if connection fails
+    document.getElementById("connectParent").style.color = "red";
+  }
+});
+
+    // Function to toggle the relay (ON or OFF)
     function toggleRelay(action) {
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", "/relay_" + action, true);
-        xhr.send();
+      if (writer) {
+        writer.write(action === 'on' ? "A\n" : "a\n"); // Send 'A' to turn Relay 1 ON, 'a' to turn it OFF
+        console.log("Sent:", action === 'on' ? "A" : "a");
+
+        // Relay B will toggle automatically based on Relay A's state, so no need for extra commands.
+      }
     }
 
     // Modal control functions
