@@ -173,13 +173,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
             if (podStartState) {
                 // Turn on Relay A
-                await controlRelay('A', 'ON');
+                await controlRelay('D', 'ON');
                 podStartButton.classList.add('active');
                 podStartButton.style.backgroundColor = 'red';
                 podStartButton.textContent = 'POD STOP';
             } else {
                 // Turn off Relay A
-                await controlRelay('a', 'OFF');
+                await controlRelay('d', 'OFF');
                 podStartButton.classList.remove('active');
                 podStartButton.style.backgroundColor = 'green';
                 podStartButton.textContent = 'POD START';
@@ -227,12 +227,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 launchpadStartButton.classList.remove('active');
                 launchpadStartButton.style.backgroundColor = 'green';
                 launchpadStartButton.textContent = 'Launchpad START';
-                await controlRelay('C', 'ON'); // Relay C OFF
+                await controlRelay('c', 'ON'); // Relay C OFF
             } else {
                 launchpadStartButton.classList.add('active');
                 launchpadStartButton.style.backgroundColor = 'red';
                 launchpadStartButton.textContent = 'Launchpad STOP';
-                await controlRelay('c', 'Off'); // Relay C ON
+                await controlRelay('C', 'Off'); // Relay C ON
             }
         });
     } else {
@@ -248,12 +248,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 inverterStartButton.classList.remove('active');
                 inverterStartButton.style.backgroundColor = 'green';
                 inverterStartButton.textContent = 'Inverter START';
-                await controlRelay('D', 'ON'); // Relay D OFF
+                await controlRelay('a', 'ON'); // Relay D OFF
             } else {
                 inverterStartButton.classList.add('active');
                 inverterStartButton.style.backgroundColor = 'red';
                 inverterStartButton.textContent = 'Inverter STOP';
-                await controlRelay('d', 'OFF'); // Relay D ON
+                await controlRelay('A', 'OFF'); // Relay D ON
             }
         });
     } else {

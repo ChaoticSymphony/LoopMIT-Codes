@@ -17,7 +17,7 @@
       <!-- Control Buttons -->
       <button id="connectESP32" class="connect-button">Connect ESP32</button>
       <button id="brakeRelease" class="brake-button">POD START</button>
-      <button id="LVEngage" class="low-voltage-engage">LV START</button>
+      <!--<button id="LVEngage" class="low-voltage-engage">LV START</button> -->
       <button id="launchpadStart" class="launchpad-button">Launchpad START</button>
       <button id="InverterStart" class="Inverter-button">Inverter START</button>
       <button id="emergencyBrake" class="emergency-brake-button-engage">EMERGENCY STOP</button>
@@ -80,27 +80,6 @@
         <div class="value-display" id="LVS-voltage">24V</div>
       </div>
 
-      <!-- Battery Status -->
-      <div class="parameter-box battery-box">
-        <label>LVS Battery Status</label>
-        <div class="battery-container">
-          <div class="value-display" id="battery1">Battery-1: 100%</div>
-          <div class="value-display" id="battery2">Battery-2: 100%</div>
-        </div>
-      </div>
-
-      <!-- Gap Height Readings (Rename "gap4" to "gap5") -->
-      <div class="parameter-box">
-        <label>Gap Heights</label>
-        <div class="gap-container">
-            <div class="value-display" id="gap1">Sensor-1: 0mm</div>
-            <div class="value-display" id="gap2">Sensor-2: 0mm</div>
-            <div class="value-display" id="gap3">Sensor-3: 0mm</div>
-            <div class="value-display" id="gap4">Sensor-4: 0mm</div>
-            <div class="value-display" id="gap5">Sensor-5: 0mm</div>
-        </div>
-      </div>
-
       <!-- Pod Speed -->
       <div class="parameter-box">
         <label>Pod Speed</label>
@@ -117,6 +96,27 @@
       <div class="parameter-box">
         <label>Air Tank Pressure</label>
         <div class="value-display" id="pressure-value-2">1.0 atm</div>
+      </div>
+      
+      <!-- Battery Status -->
+      <!-- <div class="parameter-box battery-box">
+        <label>LVS Battery Status</label>
+        <div class="battery-container">
+          <div class="value-display" id="battery1">Battery-1: 100%</div>
+          <div class="value-display" id="battery2">Battery-2: 100%</div>
+        </div>
+      </div> -->
+      
+      <!-- Gap Height Readings (Rename "gap4" to "gap5") -->
+      <div class="parameter-box">
+        <label>Gap Heights</label>
+        <div class="gap-container">
+            <div class="value-display" id="gap1">Sensor-1: 0mm</div>
+            <div class="value-display" id="gap2">Sensor-2: 0mm</div>
+            <div class="value-display" id="gap3">Sensor-3: 0mm</div>
+            <div class="value-display" id="gap4">Sensor-4: 0mm</div>
+            <div class="value-display" id="gap5">Sensor-5: 0mm</div>
+        </div>
       </div>
 
     </main>
