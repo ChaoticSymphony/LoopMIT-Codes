@@ -11,21 +11,26 @@ function showTemperatureAlert(temp) {
 }
 
 async function activateEmergencyBrakes() {
-    if (writer) {
-        try {
-            await writer.write("EMERGENCY_BRAKE\n");
-            console.log("Emergency brakes activated due to critical temperature");
-            
-            // Trigger emergency brake button visual feedback
-            const emergencyButton = document.getElementById('emergencyBrake');
-            if (emergencyButton) {
-                emergencyButton.style.backgroundColor = '#ff0000';
-            }
-        } catch (error) {
-            console.error("Failed to activate emergency brakes:", error);
+    if (!writer) return;
+    try {
+        // Send the emergency brake command
+        await writer.write("EMERGENCY_BRAKE\n");
+        console.log("Emergency brakes activated due to critical temperature");
+
+        // Update emergency brake button visual feedback
+        const emergencyButton = document.getElementById('emergencyBrake');
+        if (emergencyButton) {
+            emergencyButton.style.backgroundColor = '#ff0000';
         }
+
+        // Activate Relay A and Relay B
+        await controlRelay('A', 'ON');  // Turn Relay A ON
+        await controlRelay('b', 'ON');  // Turn Relay B ON
+    } catch (error) {
+        console.error("Failed to activate emergency brakes:", error);
     }
 }
+
 
 function calculateSpeed(acceleration) {
     return Math.abs(acceleration); // Simple conversion of acceleration to speed
