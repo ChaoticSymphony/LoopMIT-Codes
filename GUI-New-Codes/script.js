@@ -24,8 +24,8 @@ async function activateEmergencyBrakes() {
         }
 
         // Activate Relay A and Relay B
-        await controlRelay('A', 'ON');  // Turn Relay A ON
-        await controlRelay('b', 'ON');  // Turn Relay B ON
+        await controlRelay('a', 'ON');  // Turn Relay A OFF
+        await controlRelay('B', 'ON');  // Turn Relay B OFF
     } catch (error) {
         console.error("Failed to activate emergency brakes:", error);
     }
@@ -212,12 +212,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
             if (lvStartButton.classList.contains('active')) {
                 lvStartButton.classList.remove('active');
                 lvStartButton.style.backgroundColor = 'green';
-                lvStartButton.textContent = 'LV START';
+                lvStartButton.textContent = 'Contacer START';
                 await controlRelay('B', 'OFF'); // Relay B OFF
             } else {
                 lvStartButton.classList.add('active');
                 lvStartButton.style.backgroundColor = 'red';
-                lvStartButton.textContent = 'LV STOP';
+                lvStartButton.textContent = 'Contacter STOP';
                 await controlRelay('b', 'ON'); // Relay B ON
             }
         });
