@@ -321,6 +321,28 @@ async function handleData(data) {
                 contacterVoltage.textContent = `${data.VB3}V`;
             }
         }
+
+        // Update orientation display if available
+        if (data.orientation && Array.isArray(data.orientation)) {
+            const orientationX = data.orientation[0];
+            const orientationY = data.orientation[1];
+            const orientationZ = data.orientation[2];
+
+            const orientationXDisplay = document.getElementById('orientation-x');
+            const orientationYDisplay = document.getElementById('orientation-y');
+            const orientationZDisplay = document.getElementById('orientation-z');
+
+            if (orientationXDisplay) {
+                orientationXDisplay.textContent = `${orientationX.toFixed(1)}°`;
+            }
+            if (orientationYDisplay) {
+                orientationYDisplay.textContent = `${orientationY.toFixed(1)}°`;
+            }
+            if (orientationZDisplay) {
+                orientationZDisplay.textContent = `${orientationZ.toFixed(1)}°`;
+            }
+        }
+
     } catch (error) {
         console.error('Error processing data:', error);
     }
