@@ -1,3 +1,4 @@
+
 body {
     font-family: Arial, sans-serif;
     margin: 0px 20px 20px 20px; 
@@ -131,7 +132,7 @@ h1 {
     font-size: 30px;
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    height: 170px;
+    height: 150px;
     width: 100%;
     padding: 15px;
     box-sizing: border-box;
@@ -292,11 +293,6 @@ h1 {
 
 .parameter-box.offline .status-badge.offline {
     background-color: #f44336;  /* Red for the badge */
-}
-
-/* sets the height of the emergency brake button to match the height of the buttons on the same row */
-#podStop {
-    height: 195px !important; /* or any desired height */
 }
 
 .download-json-button {

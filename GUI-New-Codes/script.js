@@ -244,13 +244,21 @@ async function handleData(data) {
                 console.log('MLX temperature display updated:', mlxTemp);
             }
             
-            // Update DS18B20 temperature display
+            // Update DS18B20 temperature display (LIM Temperature)
             const dsTempDisplay = document.getElementById('motor-temp');
             if (dsTempDisplay && dsTemp !== undefined) {
                 dsTempDisplay.textContent = `${dsTemp.toFixed(1)}°C`;
                 console.log('DS temperature display updated:', dsTemp);
             }
-
+            
+            // NEW FEATURE: If the parent ESP32 is connected and LIM temperature is 0, wait 5 seconds and then activate emergency brakes.
+            const currentTime = new Date();
+            if ((currentTime - lastParentEspData < CONNECTION_TIMEOUT) && dsTemp === 95) {
+                console.log("Parent ESP32 is connected and LIM temperature is 0. Waiting for 5 seconds before activating emergency brakes.");
+                await new Promise(resolve => setTimeout(resolve, 5000)); // Wait for 5 seconds
+                await activateEmergencyBrakes();
+            }
+            
             // Check for critical temperature from either sensor
             if (mlxTemp > CRITICAL_TEMP || dsTemp > CRITICAL_TEMP) {
                 const criticalTemp = Math.max(mlxTemp || 0, dsTemp || 0);
@@ -317,6 +325,7 @@ async function handleData(data) {
         console.error('Error processing data:', error);
     }
 }
+
 
 async function controlRelay(relay, state) {
     if (writer) {
@@ -450,12 +459,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 podStartButton.classList.remove('active');
                 podStartButton.style.backgroundColor = 'green';
                 podStartButton.textContent = 'POD START';
-                await controlRelay('a', 'OFF'); // Now just sends 'a'
+                await controlRelay('b', 'OFF'); // Now just sends 'a'
             } else {
                 podStartButton.classList.add('active');
                 podStartButton.style.backgroundColor = 'red';
                 podStartButton.textContent = 'POD STOP';
-                await controlRelay('A', 'ON'); // Now just sends 'A'
+                await controlRelay('B', 'ON'); // Now just sends 'A'
             }
         });
     } else {
@@ -470,13 +479,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             if (podStop.classList.contains('active')) {
                 podStop.classList.remove('active');
                 podStop.style.backgroundColor = '#FFA500';
-                if (contactor.classList.contains('active')) {
-                    contactor.classList.remove('active');
-                    contactor.style.backgroundColor = 'green';
-                } else {
-                    contactor.classList.add('active');
-                    contactor.style.backgroundColor = 'red';
-                }
+                
                 if (podStartButton.classList.contains('active')) {
                     podStartButton.classList.remove('active');
                     podStartButton.style.backgroundColor = 'green';
@@ -486,18 +489,33 @@ document.addEventListener('DOMContentLoaded', (event) => {
                     podStartButton.style.backgroundColor = 'red';
                     podStartButton.textContent = 'POD STOP';
                 }
+                if (launchpadStartButton.classList.contains('active')) {
+                    launchpadStartButton.classList.remove('active');
+                    launchpadStartButton.style.backgroundColor = 'green';
+                    launchpadStartButton.textContent = 'Launchpad START';
+                } else {
+                    launchpadStartButton.classList.add('active');
+                    launchpadStartButton.style.backgroundColor = 'red';
+                    launchpadStartButton.textContent = 'Launchpad STOP';
+                }
+                if (inverterStartButton.classList.contains('active')) {
+                    inverterStartButton.classList.remove('active');
+                    inverterStartButton.style.backgroundColor = 'green';
+                    inverterStartButton.textContent = 'Inverter START';
+                } else {
+                    inverterStartButton.classList.add('active');
+                    inverterStartButton.style.backgroundColor = 'red';
+                    inverterStartButton.textContent = 'Inverter STOP';
+                }
+                
+
                 // await controlRelay('b','OFF'); // Relay d OFF
-                // await controlRelay('a','OFF'); // Relay c OFF
-                await controlRelay('B', 'ON'); // Relay D ON
+                await controlRelay('D','ON'); // Relay c OFF
+                // await controlRelay('B', 'ON'); // Relay D ON
                 await controlRelay('A', 'ON'); // Relay C ON
+                await controlRelay('B', 'ON'); // Relay D OFF
+                await controlRelay('C', 'OFF'); // Relay D OFF
             } else {
-                if (contactor.classList.contains('active')) {
-                    contactor.classList.remove('active');
-                    contactor.style.backgroundColor = 'green';
-                } else {
-                    contactor.classList.add('active');
-                    contactor.style.backgroundColor = 'red';
-                }
                 if (podStartButton.classList.contains('active')) {
                     podStartButton.classList.remove('active');
                     podStartButton.style.backgroundColor = 'green';
@@ -507,55 +525,79 @@ document.addEventListener('DOMContentLoaded', (event) => {
                     podStartButton.style.backgroundColor = 'red';
                     podStartButton.textContent = 'POD STOP';
                 }
+                if (launchpadStartButton.classList.contains('active')) {
+                    launchpadStartButton.classList.remove('active');
+                    launchpadStartButton.style.backgroundColor = 'green';
+                    launchpadStartButton.textContent = 'Launchpad START';
+                } else {
+                    launchpadStartButton.classList.add('active');
+                    launchpadStartButton.style.backgroundColor = 'red';
+                    launchpadStartButton.textContent = 'Launchpad STOP';
+                }
+                if (inverterStartButton.classList.contains('active')) {
+                    inverterStartButton.classList.remove('active');
+                    inverterStartButton.style.backgroundColor = 'green';
+                    inverterStartButton.textContent = 'Inverter START';
+                } else {
+                    inverterStartButton.classList.add('active');
+                    inverterStartButton.style.backgroundColor = 'red';
+                    inverterStartButton.textContent = 'Inverter STOP';
+                }
+
+
                 podStop.classList.add('active');
                 podStop.style.backgroundColor = '#FF4500';
-                await controlRelay('b','OFF'); // Relay d OFF
+                // await controlRelay('b','OFF'); // Relay d OFF
                 await controlRelay('a','OFF'); // Relay c OFF
+                await controlRelay('d','OFF'); // Relay c OFF
+                await controlRelay('b', 'OFF'); // Relay D OFF
+                await controlRelay('c', 'OFF'); // Relay D OFF
+                
             }
         });
     } else {
         console.error('POD Stop button not found');
     }
     
-    // CONTACTOR button toggle functionality
-    if (contactor) {
-        console.log('contactor button found');
-        contactor.addEventListener('click', async () => {
-            console.log('contactor button clicked');
-            if (contactor.classList.contains('active')) {
-                contactor.classList.remove('active');
-                contactor.style.backgroundColor = 'green';
-                await controlRelay('b', 'OFF'); // Relay d OFF
-            } else {
-                contactor.classList.add('active');
-                contactor.style.backgroundColor = 'red';
-                await controlRelay('B', 'ON'); // Relay D ON
-            }
-        });
-    } else {
-        console.error('contactor button not found');
-    }
+    // // CONTACTOR button toggle functionality
+    // if (contactor) {
+    //     console.log('contactor button found');
+    //     contactor.addEventListener('click', async () => {
+    //         console.log('contactor button clicked');
+    //         if (contactor.classList.contains('active')) {
+    //             contactor.classList.remove('active');
+    //             contactor.style.backgroundColor = 'green';
+    //             await controlRelay('b', 'OFF'); // Relay d OFF
+    //         } else {
+    //             contactor.classList.add('active');
+    //             contactor.style.backgroundColor = 'red';
+    //             await controlRelay('B', 'ON'); // Relay D ON
+    //         }
+    //     });
+    // } else {
+    //     console.error('contactor button not found');
+    // }
 
-    // LV START button toggle functionality
-    if (lvStartButton) {
-        console.log('LV START button found');
-        lvStartButton.addEventListener('click', async () => {
-            console.log('LV START button clicked');
-            if (lvStartButton.classList.contains('active')) {
-                lvStartButton.classList.remove('active');
-                lvStartButton.style.backgroundColor = 'green';
-                lvStartButton.textContent = 'LV START';
-                await controlRelay('b', 'OFF'); // Relay B OFF
-            } else {
-                lvStartButton.classList.add('active');
-                lvStartButton.style.backgroundColor = 'red';
-                lvStartButton.textContent = 'LV STOP';
-                await controlRelay('B', 'ON'); // Relay B ON
-            }
-        });
-    } else {
-        console.error('LV START button not found');
-    }
+    // // LV START button toggle functionality
+    // if (lvStartButton) {
+    //     console.log('LV START button found');
+    //     lvStartButton.addEventListener('click', async () => {
+    //         console.log('LV START button clicked');
+    //         if (lvStartButton.classList.contains('active')) {
+    //             lvStartButton.classList.remove('active');
+    //             lvStartButton.style.backgroundColor = 'green';
+    //             lvStartButton.textContent = 'LV START';
+    //             await controlRelay('b', 'OFF'); // Relay B OFF
+    //         } else {
+    //             lvStartButton.classList.add('active');
+    //             lvStartButton.style.backgroundColor = 'red';
+    //             lvStartButton.textContent = 'LV STOP';
+    //             await controlRelay('B', 'ON'); // Relay B ON
+    //         }
+    //     });
+    // } else {
+    //     console.error('LV START button not found');
+    // }
 
     // Launchpad START button toggle functionality
     if (launchpadStartButton) {
